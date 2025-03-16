@@ -1,0 +1,442 @@
+<html>
+  <head>
+    <link rel="preload" as="fetch" href="https://octothorp.es/?uri=https://lil-bits.nobr.me/ritual" >
+<link rel="octo:octothorpes" href="weirdweboctober" >
+<link rel="octo:octothorpes" href="Ritual" >
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+<style>
+body {
+  margin: 0;
+  font-family: "Afacad Flux", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+  background-color: #231942;
+  color: #EEE;
+}
+
+h1 {
+  margin-bottom: 0px;
+  font-size: 118px;
+  line-height: 114px;
+  margin-top: 40px;
+  color: #e0b1cb;
+}
+
+.rune {
+  font-family: "Source Code Pro", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 144px;
+  line-height: 0px;
+  margin-top: 84px;
+  margin-bottom: 64px;
+  color: #be95c4;
+}
+
+.container {
+  width: 800px;
+  margin: auto;
+  text-align: center;
+  font-size: 24px;
+}
+
+input {
+  font-size: 24px;
+}
+
+.subtitle {
+  font-size: 16px;
+  margin: auto;
+  color: #9f86c0;
+}
+
+.subtitle2 {
+  font-size: 18px;
+  margin: 0px 4px;
+  color: #5e548e;
+}
+
+.button{
+  border: 1px solid #DDD;
+  margin: 8px auto;
+  padding: 0px 5px 3px 5px;
+  width: fit-content;
+  cursor: pointer;
+}
+
+td {
+  width: 54px;
+  height: 48px;
+  border: 1px solid white;
+  text-align: center;
+  font-size: 36px;
+}
+
+.step {
+  margin: 28px 0px 48px 0px;
+}
+
+table {
+  margin: 24px auto;
+}
+
+.prompt {
+  margin-bottom: 4px;
+  margin-top: 0px;
+  color: #be95c4;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #656990;
+  padding: 0;
+}
+
+.rune-name {
+  font-size: 72px;
+  font-weight: bold;
+  color: #be95c4;
+}
+
+.description {
+  font-size: 18px;
+  white-space: pre-wrap;
+}
+</style>
+<script type="text/javascript">
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+</script>
+<script>
+// supports both simple arrays and complex weighted arrays
+let randomChoice = (array) => {
+  if (array.length === 0) {
+    return
+  }
+  if (array[0].weight === undefined || Array.isArray(array[0])) {
+    return array[Math.floor(array.length * Math.random())]
+  } else {
+    // First, we loop the main dataset to count up the total weight. We're starting the counter at one because the upper boundary of Math.random() is exclusive.
+    var total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      total += parseInt(array[i].weight);
+    }
+
+    // Total in hand, we can now pick a random value akin to our
+    // random index from before.
+    const threshold = Math.random() * total;
+
+    // Now we just need to loop through the main data one more time
+    // until we discover which value would live within this
+    // particular threshold. We need to keep a running count of
+    // weights as we go, so let's just reuse the "total" variable
+    // since it was already declared.
+    total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      // Add the weight to our running total.
+      total += parseInt(array[i].weight);
+
+      // If this value falls within the threshold, we're done!
+      if (total >= threshold) {
+        return array[i].value;
+      }
+    }
+    return array[i].value;
+  }
+}
+
+let runes = [
+  {
+    "rune": "☿",
+    "name": "Mercury",
+    "description": `Mercury is considered to be the foundation of alchemy by the alchemists of antiquity. To these alchemists, mercury represented the omnipresent spirit of life. It was believed that mercury could transcend liquid and solid states and also the cycle of life and death, forming a bridge between the body and the soul. To those ancient practitioners of alchemy, mercury stood as a symbol of the intellect, imagination, moral judgment, and the higher mental faculties.
+    
+To the alchemist of today, mercury is the art of transmutation personified. It is Mercury’s divine nature that allows the alchemist to transforms one’s life and live more in harmony with the laws of nature. Mercury to the alchemist of today, is a symbol of the sexual waters of creation and the spinal fluid, that brings the carnal desires into submission of the divine mind. Once the alchemist understands the principles of mercury (mind) and finds balance between its passive force, and sulfur’s (soul) active force, within his or her salt (fixed matter/body), he or she will become the philosopher’s stone, able to turn lead into gold at will.`
+  }, {
+    "rune": "🜔",
+    "name": "Salt",
+    "description": `As an element of the Tria Prima, salt represents earth and the human body. Salt in alchemy is also a symbol for lower consciousness  and is often identified with self-knowledge and wisdom. Salt is a constrictive force and displays characteristics of condensation and crystallization. To the alchemists of the renaissance, salt is the substance of all things physical, the fixed principle of all that exist. It is believed that salt can protect one from evil spirits such as demons and the evil eye cast by black magic practitioners.
+    
+To the alchemist, salt is viewed as the element key to the dissolving of the ego. The pain and bitterness that comes with spiritual growth is connected to the purifying principles of salt. Salt to the alchemist is the highest exaltation of matter, that has been achieved through the union of opposites and the transcendence of  all ignorance. Salt (body) is an essential element in creating the philosopher’s stone when it is in perfect harmony with sulfur (soul) and mercury (mind).`,
+  }, {
+    "rune": "🜍",
+    "name": "Sulfur",
+    "description": `Sulfur in alchemy represents the soul of all materials and living things. In alchemy, sulfur is synonymous  with consciousness and the expansion of thought. To the ancient alchemist, sulfur’s properties are dryness, heat, evaporation, expansion, and dissolution.
+    
+To the alchemist, sulfur is the bridge that connects the body with mind. It is the understanding of sulfur’s presence in all living things and materials that is fundamental in all alchemical processes. Sulfur is the key to unlocking the inner workings of the soul and consciousness.`,
+  }, {
+    "rune": "🜁",
+    "name": "Air",
+    "description": `Air to the alchemist represents the mind and soul of mankind. Air in alchemy is the breath of life. Air’s principle is mobility and the creative facilities of the mind, giving life to new ideas and the possibility of a world reborn.
+    
+Air is an active quality and the opposite of its fixed counterpart, earth. Where earth is easy to determine and defined, air is constantly moving and hard to nail down. Air is most characterized by the wind. The wind is forever present yet invisible, powerful yet comforting, terrifying yet liberating.`,
+  }, {
+    "rune": "🜃",
+    "name": "Earth",
+    "description": `To the alchemist, earth represents base matter and the ability to stand firm in one’s understanding and belief. Earth also represents the physical body and the processing of the material world around us.
+    
+Earth as an alchemical element is passive, moving in perfect harmony through the seasons as a personification of life and death. Earth reveals to the alchemist that spiritual work often happens in the unseen realms, manifesting itself through the material world.`,
+  }, {
+    "rune": "🜂",
+    "name": "Fire",
+    "description": `In the secret societies, whose origins are in antiquity, fire represents the intellect - man’s ability to problem solve and think for oneself. To those mystery schools, it is fire that Prometheus stole from the gods to bring us out of bondage. In the secret societies, fire (intellect) will allow them to conquer man, conquer nature, and bring them into godhood (apotheosis). To the priesthoods of old, fire is a tool of control, which they manipulate to dictate the course of society and do so still today.
+
+Fire in alchemy represents the start of the alchemical process. It is the passion and desire of an alchemist. Fire in its nature is both a creative force and a destructive one. It is the heat of the fire that purges away all impurities and refines us to our perfect form. To the alchemist fire is a tool to be balanced, a tool of self-reflection, and a tool to bring about the greatest versions of ourselves. Fire is powerful and to be respected, but not worshiped. It is only when fire is used in accordance with the other elements that its full nature can come to fruition.`,
+  }, {
+    "rune": "🜄",
+    "name": "Water",
+    "description": `Water to the alchemist represents the fluidity of spirit and consciousness. The nature of water is to give, nurture, and to adapt to one’s environment. This is why it morphs and transforms. When water is too hot it becomes vapor, too cold, it becomes ice. This is why the ancients taught that water was birthed out of fire. To explain, fire has the quality of temperature, which in turn dictates the physical, mental, and spiritual principles of water.
+    
+To harness the element of water, we must learn to be flexible in our lives. We must learn to adapt and to trust the path given to us by the divine, just as a river trusts the twists and turns of it banks on its way to the ocean.`,
+  }, {
+    "rune": "🜄",
+    "name": "Water",
+    "description": `Aristotle labeled water as cold and wet, and Hippocrates connected it to the body humor phlegm. Additionally, it’s associated with intuition as well as the color blue, and is often linked to the alchemy symbol of mercury. The Greek philosopher Thales believed water was the first substance created in the world.
+
+As another contrast to fire, the water alchemy symbol is the inverse of the fire symbol; a downward-point triangle. This symbol is sometimes said to resemble containers for holding water, such as a cup or urn.`,
+  }, {
+    "rune": "♄",
+    "name": "Lead/Saturn",
+    "description": `To the alchemist of antiquity, Lead/Saturn represents the Prima Matera (primal material) or base matter. Lead/Saturn to the alchemist of old had qualities of putrefaction, decay, limitation, protection, and self control. It was believed that by separating and purifying this element, one can bring balance to its constituent essence, turning lead into pure gold.
+    
+To the alchemist of today, Lead/Saturn is the personification of the ego, which must be purified in order to free the soul. It is through the transmutation of Lead, that the alchemist transforms from a being ruled by carnal desires into man or woman in tune with the laws of nature. This allows the alchemist to live a life within the will of the divine.  It is through the lessons of time given by Saturn that alchemists transcend the cycle of life and death, becoming beings filled with light and life that shine as bright as pure gold in the rays of the sun.`,
+  }, {
+    "rune": "♃",
+    "name": "Tin/Jupiter",
+    "description": `To the priesthood of antiquity,  Jupiter/Tin embodied qualities of wisdom, logic, education, and maturity. To those philophers of old,  Jupiter/Tin was the planet and metal of the sages and scholars. Jupiter/Tin was a symbol of meditation and a balance philosophical view of life. It was believed that Jupiter/Tin’s energy gave them access to the higher mental planes.
+    
+To the alchemist, of today, Jupiter/Tin is connected with growth, the metabolic system, the liver, the tongue, saliva and the nutrients given to the blood through food. It is the goal of the alchemist, to balance the jovial energy of Jupiter with the reality of life. Although Jupiter gives feelings of cheerfulness, expansiveness, and access to powerful spiritual forces, it can also make the alchemist inflated and shallow. This imbalance can cause the alchemist to blame others for their mistakes and the alchemist will lack the depth necessary to use the spiritual power given by Jupiter/Tin. It is believed that when the alchemist can bring together the active energy of Jupiter and the passive energy of mercury, that the combination will bring about deeper insight into the alchemist’s role in the universe, giving him or her an intimate understanding of the great mysteries of life and transforming them into a spiritual master.`,
+  }, {
+    "rune": "♀",
+    "name": "Copper/Venus",
+    "description": `Venus/Copper was the planet/element that represented aspects of beauty, love, lust, artistic creativity, affection, fertility, and balanced thinking. In magic, Venus/Copper is used to promote love, sensuality, friendship, positive relationships, fruitful negations, and peace.
+    
+To the alchemist, Venus/Copper represents the love and compassion needed to become a well-rounded individual. It is the balanced psychological energy of Venus/Copper that allows the alchemist to evaluate experiences through one’s inner eye and bring those powerful insights into conscience awareness. Through the potent energy of Venus/Copper, the alchemist will refine their psychic abilities and gain intimate knowledge of their sexuality, as well as of the plant kingdom.`,
+  }, {
+    "rune": "♂",
+    "name": "Iron/Mars",
+    "description": `Throughout the ages of civilization, Mars/Iron has stood as a symbol of vitality and fiery passion. The priesthood of antiquity, revered Mars/Iron for its qualities of courage, will power, and male generative force. These mystics of old, used Mars/Iron’s energy to confront the deepest parts of their ego, killing off all unneeded behaviors and beliefs. Mars/Iron is used in magic rituals, to promote energy, strength, determination, will power, assertively, fertility rites, and new beginnings and undertakings.
+    
+To the alchemist of today, Mars/Iron gives us the energy and courage to face our deepest fears and traumas. While teaching us to not conform to others beliefs and to form our own world view. When the alchemist is out of balance with Mars/Iron they can become judgmental, over critical, stubborn, or have feelings of unworthiness, passive, timid, and indecisive. When Mars/Iron is brought into harmony, it can give the alchemist the stamina and courage needed to face any obstacle he or she may face.  It is important to note, that without the drive and assertiveness given by Mars/Iron, one becomes stagnate and unwilling to face the hard trials of life.`,
+  }, {
+    "rune": "☽",
+    "name": "Silver/Moon",
+    "description": `Since the dawn of civilization, the Moon/Silver has stood as a symbol of mystery, occult power, immortality, intuition, resurrection, and illumination. To the priesthoods of antiquity, the Moon/Silver was the doorway through which the initiate could view their sub-conscious mind and emotions. Even in those early days of human life, the power the Moon/Silver had over the ebb and flow of the tides and the temperament of the plants and animals was well known. The alchemists believed that the morning dew came from the Moon/Silver and held the essence of the luminary.
+    
+To the alchemist of today, the Moon/Silver is a symbol for inner wisdom, contemplation, and transition. To the alchemist, the Moon/Silver’s energy is used as a tool to understand one’s own intuition and to better adapt to the new life they have created for themselves. It is through the light of the Moon reflected from the Sun, that the alchemist is able to find the answers of the deep mysteries of life and becomes one with his or her immortal soul. The Moon/Silver reminds us all that growth is subtle, and our true power is revealed when we learn to appreciate the mysteries and beauty of life.`,
+  }, {
+    "rune": "☉",
+    "name": "Gold/Sun",
+    "description": `Since the being of mankind’s time on earth, we have always looked at the Sun/Gold as a beacon of hope, warmth, confront, and protection. To the first initiates into the mysteries, the Sun/Gold represented pure spiritual fire, pure conscious, pure awareness, and the perfect ethereal body. To the adepts of the Ancient World, the Sun/Gold represented the light that rises from the darkness, giving force to the elements and intellect of mankind. To the alchemist of those days, Sun/Gold was the divine seed that lay dormant in all matter and living things. Those alchemist believed,  that Sun/Gold was the proof of God’s spirit given to man, unlocked through the purification of the soul.,
+
+To the alchemist of today, Sun/Gold is the spiritual fire that lives in man. It is through Sun/Gold that the alchemist is able to unlock divine creativity, uniting him or herself with the soul of the God. Because of Sun/Gold qualities of flexibility, endurance (does not tarnish), and pure nature, the alchemists learns to use the fire of his soul to purify him or herself, becoming a perfect vessel for the will of the Divine. Once the alchemist, has learned to use the courage, strength, and authority given by the Sun/Gold’s energy, they will overcome all trauma and imperfection and will gain full control of themselves and the world around them.`
+  }
+]
+
+let characters = [
+  "━",
+  "┃",
+  "┏",
+  "┓",
+  "┗",
+  "┛",
+  "┣",
+  "┫",
+  "┳",
+  "┻",
+]
+
+let requestTiming = 0
+
+let toggle = (context) => {
+  if ($(context).text()) {
+    $(context).text("")
+  } else {
+    $(context).text(randomChoice(characters))
+  }
+}
+
+let surroundingMap = [
+  [1,3,4,5,7,13,14,15], // 0
+  [0,2,4,5,6,12,13,14], // 1
+  [1,3,5,6,7,13,14,15], // 2
+  [2,0,6,7,4,14,15,12], // 3
+  [3,0,1,7,5,16,12,13], // 4
+  [4,6,8,9,10,0,1,2], // 5
+  [1,2,3,5,7,9,10,11], // 6
+  [2,3,0,6,4,10,11,8], // 7
+  [7,4,5,11,9,15,12,13], // 8
+  [4,5,6,8,10,12,13,14], // 9
+  [5,6,7,9,11,13,14,15], // 10
+  [6,7,4,10,8,14,15,12], // 11
+  [8,9,11,15,13,0,1,3], // 12
+  [8,9,10,12,14,0,1,2], // 13
+  [9,10,11,13,15,0,1,2,3], // 14
+  [2,3,0,10,11,8,14,12], // 15
+]
+
+let iterate = () => {
+  let oldState = []
+  for (let i=0;i<15;i++) {
+    let lotName = `lot${i}`
+    oldState[i] = !!$(`.${lotName}`).text()
+  }
+  let newState = []
+  for (let i=0;i<16;i++) {
+    let sum = 0
+    for (let index of surroundingMap[i]) {
+      if (oldState[index]) {
+        sum = sum + 1
+      }
+    }
+    let currentLotName = `lot${i}`
+    let currentLife = !!($(`.${currentLotName}`).text())
+    if (currentLife && sum < 2) {
+      newState[i] = false
+    } else if (currentLife && sum > 3) {
+      newState[i] = false
+    } else if (!currentLife && sum == 3) {
+      newState[i] = true
+    } else {
+      newState[i] = currentLife
+    }
+  }
+
+  if (newState.filter((e) => e).length === 0) {
+    ending();
+    return
+  }
+
+  for (let i=0;i<16;i++) {
+    let currentLotName = `lot${i}`
+    if (newState[i]) {
+      $(`.${currentLotName}`).text(randomChoice(characters))
+    } else {
+      $(`.${currentLotName}`).text("")
+    }
+  }
+}
+
+let ending = () => {
+      clearInterval(intervalID)
+      clearTimeout(timeoutID)
+      let values = []
+      for (let i=0;i<16;i++) {
+         let currentLotName = `lot${i}`
+         if (!$(`.${currentLotName}`).text()) {
+           values.push(0)
+         } else {
+           values.push(($(`.${currentLotName}`).text()).charCodeAt(0))
+         }
+      }
+      let sum = 0
+      for (let i=0;i<16;i++) {
+        sum = sum + (values[i] % (i + 1))
+      }
+      let rune = runes[sum % runes.length]
+      $(".rune").text(rune.rune)
+      $(".rune-name").text(rune.name)
+      $(".description").text(rune.description)
+      $(".step3").show()
+}
+let intervalID = 0
+let timeoutID = 0
+$(document).ready(function() {
+  $(".step2").hide()
+  $(".step3").hide()
+  $("td").on("click", function() {
+    toggle(this)
+  })
+  $(".submit").on("click", () => {
+    $(".step1").hide()
+    $(".step2").show()
+  })
+  $(".cast").on("click", () => {
+    let requestHash = CryptoJS.MD5($('.request').val()).toString();
+    requestTiming = parseInt(requestHash, 17) % 5000
+    intervalID = setInterval(iterate, 77)
+    timeoutID = setTimeout(ending, requestTiming)
+  })
+})
+</script>
+<title>DIGITAL AUGUR</title>
+  </head>
+<body>
+  <div class="container">
+    <h1>DIGITAL AUGUR</h1>
+    <div class="subtitle">Glimpse into your future with the mysterious and arcane mechanisms of <b>ＪＡＶＡＳＣＲＩＰＴ</b></div>
+    <div class="step step1">
+      <h2 class="prompt">
+        What would you like insight on?
+      </h2>
+      <input type="text" class="request">
+      <div class="submit button">Submit</div>
+    </div>
+    <div class="step step2">
+      <h2 class="prompt">
+        Select your lots and cast them.
+      </h2>
+      <div class="subtitle2">(Toggle at least 3)</div>
+      <table>
+        <tbody>
+          <tr>
+            <td class="lot0"></td>
+            <td class="lot1"></td>
+            <td class="lot2"></td>
+            <td class="lot3"></td>
+          </tr>
+          <tr>
+            <td class="lot4"></td>
+            <td class="lot5"></td>
+            <td class="lot6"></td>
+            <td class="lot7"></td>
+          </tr>
+          <tr>
+            <td class="lot8"></td>
+            <td class="lot9"></td>
+            <td class="lot10"></td>
+            <td class="lot11"></td>
+          </tr>
+          <tr>
+            <td class="lot12"></td>
+            <td class="lot13"></td>
+            <td class="lot14"></td>
+            <td class="lot15"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="cast button">Cast</div>
+    </div>
+    <hr>
+    <div class="step step3">
+      <div>
+        You drew
+      </div>
+      <h2 class="rune"></h2>
+      <div class="rune-name"></div>
+      </br>
+      <code class="description"></code>
+    </div>
+  </div>
+</body>
+</html>

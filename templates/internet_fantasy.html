@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <!-- Primary Meta Tags -->
+    <title>~ I N T E R N E T  F A N T A S Y ~</title>
+    <meta name="title" content="~ I N T E R N E T  F A N T A S Y ~">
+    <meta name="description" content="Internet Fantasy is a 24/7 audio/visual radio station run by a robo-dj.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nobr.me/internet-fantasy">
+    <meta property="og:title" content="~ I N T E R N E T  F A N T A S Y ~">
+    <meta property="og:description" content="Internet Fantasy is a 24/7 audio/visual radio station run by a robo-dj.">
+    <meta property="og:image" content="https://i.imgur.com/OwsHMOx.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nobr.me/internet-fantasy">
+    <meta property="twitter:title" content="~ I N T E R N E T  F A N T A S Y ~">
+    <meta property="twitter:description" content="Internet Fantasy is a 24/7 audio/visual radio station run by a robo-dj.">
+    <meta property="twitter:image" content="https://i.imgur.com/OwsHMOx.jpg">
+  </head>
+  <body style="margin: 0px; background: black; text-align: center">
+    <div style="height: 200px">
+    <img src="https://i.imgur.com/RzwL6lm.gif" style="margin-top:-40px;">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- Or if you want a more recent alpha version -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/hls.js@alpha"></script> -->
+    <video controls id="video" style = "width:100%"></video>
+    <script>
+      window.addEventListener('load', function () {
+        var playing = false
+        var video = document.getElementById('video');
+        var videoSrc = 'https://nobr.me/hls/internet-fantasy.m3u8';
+        if (Hls.isSupported()) {
+          var hls = new Hls();
+          hls.loadSource(videoSrc);
+          hls.attachMedia(video);
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = videoSrc;
+        }
+        video.onclick = function() {
+          if (!playing) {
+            video.play()
+            playing = true
+          } else {
+            video.pause()
+            playing = false
+          }
+        }
+      })
+    </script>
+    <div style="text-align: left; color:white; margin-top:20px">
+      Internet Fantasy is a 24/7 audio/visual radio station. the videos are mostly just sakuga or "exceptional animation". you can find a ton simply by searching "sakuga".
+      </br></br>
+      The music is handled by an automatic DJ program. Each song has a start point and and end point and when the stream approaches the end of one song, it starts the next song in a way that the end point of the current song lines up with the next song. 
+      </br></br>
+      Like this? Have ideas? ping me at @nobelsucks on twitter.
+      </br></br>
+      Planned features so far:
+      </br>
+      - add full song names to db. I basically just have a bunch of songs saved and don't necessarily know where they're all from or who wrote them. I'll slowly be updating the songs with full info
+      </br>
+      - display clip name
+      </br>
+      - split up video clips more
+      </br>
+      - figure out a way to avoid incongruous music/video (hard)
+    </div>
+  </body>
+</html>

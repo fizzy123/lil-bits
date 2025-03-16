@@ -1,0 +1,311 @@
+<html>
+  <head>
+    <link rel="preload" as="fetch" href="https://octothorp.es/?uri=https://lil-bits.nobr.me/hashtags" >
+<link rel="octo:octothorpes" href="weirdweboctober" >
+<link rel="octo:octothorpes" href="Hashtags" >
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<style>
+body {
+  margin: 0;
+  font-family: "Afacad Flux", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+  background-color: #3d405b;
+  color: #f4f1de;
+}
+
+h1 {
+  margin-bottom: 8px;
+  font-size: 128px;
+  line-height: 114px;
+  margin-top: 20px;
+  color: #e07a5f;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #656990;
+  padding: 0;
+}
+
+.container {
+  width: 400px;
+  margin: auto;
+  text-align: left;
+}
+
+.subtitle {
+  font-size: 18px;
+  margin: 0px 4px;
+  color: #f2cc8f;
+}
+
+.hashtag {
+  display: inline-block;
+  color: #81b29a;
+}
+
+.poem {
+  font-size: 24px;
+  margin-bottom: 48px;
+}
+
+.header {
+  margin-bottom: 12px;
+}
+</style>
+<script type="text/javascript">
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+</script>
+<script>
+// supports both simple arrays and complex weighted arrays
+let randomChoice = (array) => {
+  if (array.length === 0) {
+    return
+  }
+  if (array[0].weight === undefined || Array.isArray(array[0])) {
+    return array[Math.floor(array.length * Math.random())]
+  } else {
+    // First, we loop the main dataset to count up the total weight. We're starting the counter at one because the upper boundary of Math.random() is exclusive.
+    var total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      total += parseInt(array[i].weight);
+    }
+
+    // Total in hand, we can now pick a random value akin to our
+    // random index from before.
+    const threshold = Math.random() * total;
+
+    // Now we just need to loop through the main data one more time
+    // until we discover which value would live within this
+    // particular threshold. We need to keep a running count of
+    // weights as we go, so let's just reuse the "total" variable
+    // since it was already declared.
+    total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      // Add the weight to our running total.
+      total += parseInt(array[i].weight);
+
+      // If this value falls within the threshold, we're done!
+      if (total >= threshold) {
+        return array[i].value;
+      }
+    }
+    return array[i].value;
+  }
+}
+
+let poems = [
+  [
+    ["so", "much", "depends"],
+    ["upon"],
+    [],
+    ["a", "red", "wheel"],
+    ["barrow"],
+    [],
+    ["glazed", "with", "rain"],
+    ["water"],
+    [],
+    ["beside", "the", "white"],
+    ["chickens"],
+  ],
+  [
+    ["Two", "roads", "diverged", "in", "a", "yellow", "wood"],
+    ["And", "sorry", "I", "could", "not", "travel", "both"],
+    ["And", "be", "one", "traveler,", "long", "I", "stood"],
+    ["And", "looked", "down", "one", "as", "far", "as", "I", "could"],
+    ["To", "where", "it", "bent", "in", "the", "undergrowth;"],
+    [],
+    ["Then", "took", "the", "other,", "as", "just", "as", "fair"],
+    ["And", "having", "perhaps", "the", "better", "claim"],
+    ["Because", "it", "was", "grassy", "and", "wanted", "wear;"],
+    ["Though", "as", "for", "that", "the", "passing", "there"],
+    ["Had", "worn", "them", "really", "about", "the", "same,"],
+    [],
+    ["And", "both", "that", "morning", "equally", "lay"],
+    ["In", "leaves", "no", "step", "had", "trodden", "black."],
+    ["Oh,", "I", "kept", "the", "first", "for", "another", "day!"],
+    ["Yet", "knowing", "how", "way", "leads", "on", "to", "way,"],
+    ["I", "doubted", "if", "I", "should", "ever", "come", "back."],
+    [],
+    ["I", "shall", "be", "telling", "this", "with", "a", "sigh"],
+    ["Somewhere", "ages", "and", "ages", "hence:"],
+    ["Two", "roads", "diverged", "in", "a", "wood,", "and", "I-"],
+    ["I", "took", "the", "one", "less", "traveled", "by"],
+    ["And", "that", "has", "made", "all", "the", "difference"]
+  ],
+  [
+    ["Because", "I", "could", "not", "stop", "for", "Death", "–"],
+    ["He", "kindly", "stopped", "for", "me", "–"],
+    ["The", "Carriage", "held", "but", "just", "Ourselves", "-"],
+    ["And", "Immortality."],
+    [],
+    ["We", "slowly", "drove", "–", "He", "knew", "no", "haste"],
+    ["And", "I", "had", "put", "away"],
+    ["My", "labor", "and", "my", "leisure", "too,"],
+    ["For", "His", "Civility–"],
+    [],
+    ["We", "passed", "the", "School,", "where", "Children", "strove"],
+    ["At", "Recess", "–", "in", "the", "Ring", "–"],
+    ["We", "passed", "the", "Fields", "of", "Gazing", "Grain", "–"],
+    ["We", "passed", "the", "Setting", "Sun", "–"],
+    [],
+    ["Or", "rather", "–", "He", "passed", "Us", "–"],
+    ["The", "Dews", "drew", "quivering", "and", "Chill", "–"],
+    ["For", "only", "Gossamer,", "my", "Gown", "–"],
+    ["My", "Tippet", "–", "only", "Tulle", "–"],
+    [],
+    ["We", "paused", "before", "a", "House", "that", "seemed"],
+    ["A", "Swelling", "of", "the", "Ground", "–"],
+    ["The", "Roof", "was", "scarcely", "visible", "–"],
+    ["The", "Cornice", "–", "in", "the", "Ground", "–"],
+    [],
+    ["Since", "then", "–", "'tis", "Centuries", "–", "and", "yet"],
+    ["Feels", "shorter", "than", "the", "Day"],
+    ["I", "first", "surmised", "the", "Horses'", "Heads"],
+    ["Were", "toward", "Eternity", "–"],
+  ],
+  [
+    ["I", "have", "eaten"],
+    ["the", "plums"],
+    ["that", "were", "in"],
+    ["the", "icebox"],
+    [""],
+    ["and", "which"],
+    ["you", "were", "probably"],
+    ["saving"],
+    ["for", "breakfast"],
+    [""],
+    ["Forgive", "me"],
+    ["they", "were", "delicious"],
+    ["so", "sweet"],
+    ["and", "so", "cold"],
+  ],
+  [
+    ["Tyger", "Tyger,", "burning", "bright,"],
+    ["In", "the", "forests", "of", "the", "night;"],
+    ["What", "immortal", "hand", "or", "eye,"],
+    ["Could", "frame", "thy", "fearful", "symmetry?"],
+    [""],
+    ["In", "what", "distant", "deeps", "or", "skies."],
+    ["Burnt", "the", "fire", "of", "thine", "eyes?"],
+    ["On", "what", "wings", "dare", "he", "aspire?"],
+    ["What", "the", "hand,", "dare", "seize", "the", "fire?"],
+    [""],
+    ["And", "what", "shoulder,", "&", "what", "art,"],
+    ["Could", "twist", "the", "sinews", "of", "thy", "heart?"],
+    ["And", "when", "thy", "heart", "began", "to", "beat."],
+    ["What", "dread", "hand?", "&", "what", "dread", "feet?"],
+    [""],
+    ["What", "the", "hammer?", "what", "the", "chain,"],
+    ["In", "what", "furnace", "was", "thy", "brain?"],
+    ["What", "the", "anvil?", "what", "dread", "grasp."],
+    ["Dare", "its", "deadly", "terrors", "clasp?"],
+    [""],
+    ["When", "the", "stars", "threw", "down", "their", "spears"],
+    ["And", "water'd", "heaven", "with", "their", "tears:"],
+    ["Did", "he", "smile", "his", "work", "to", "see?"],
+    ["Did", "he", "who", "made", "the", "Lamb", "make", "thee?"],
+    [""],
+    ["Tyger", "Tyger", "burning", "bright,"],
+    ["In", "the", "forests", "of", "the", "night:"],
+    ["What", "immortal", "hand", "or", "eye,"],
+    ["Dare", "frame", "thy", "fearful", "symmetry?"],
+  ],
+  [
+    ["Do", "not", "go", "gentle", "into", "that", "good", "night,"],
+    ["Old", "age", "should", "burn", "and", "rave", "at", "close", "of", "day;"],
+    ["Rage,", "rage", "against", "the", "dying", "of", "the", "light."],
+    [""],
+    ["Though", "wise", "men", "at", "their", "end", "know", "dark", "is", "right,"],
+    ["Because", "their", "words", "had", "forked", "no", "lightning", "they"],
+    ["Do", "not", "go", "gentle", "into", "that", "good", "night."],
+    [""],
+    ["Good", "men,", "the", "last", "wave", "by,", "crying", "how", "bright"],
+    ["Their", "frail", "deeds", "might", "have", "danced", "in", "a", "green", "bay,"],
+    ["Rage,", "rage", "against", "the", "dying", "of", "the", "light."],
+    [""],
+    ["Wild", "men", "who", "caught", "and", "sang", "the", "sun", "in", "flight,"],
+    ["And", "learn,", "too", "late,", "they", "grieved", "it", "on", "its", "way,"],
+    ["Do", "not", "go", "gentle", "into", "that", "good", "night."],
+    [""],
+    ["Grave", "men,", "near", "death,", "who", "see", "with", "blinding", "sight"],
+    ["Blind", "eyes", "could", "blaze", "like", "meteors", "and", "be", "gay,"],
+    ["Rage,", "rage", "against", "the", "dying", "of", "the", "light."],
+    [""],
+    ["And", "you,", "my", "father,", "there", "on", "the", "sad", "height,"],
+    ["Curse,", "bless,", "me", "now", "with", "your", "fierce", "tears,", "I", "pray."],
+    ["Do", "not", "go", "gentle", "into", "that", "good", "night."],
+    ["Rage,", "rage", "against", "the", "dying", "of", "the", "light."],
+  ],
+  [
+    ["I", "met", "a", "traveller", "from", "an", "antique", "land,"],
+    ["Who", "said—“Two", "vast", "and", "trunkless", "legs", "of", "stone"],
+    ["Stand", "in", "the", "desert.", ".", ".", ".", "Near", "them,", "on", "the", "sand,"],
+    ["Half", "sunk", "a", "shattered", "visage", "lies,", "whose", "frown,"],
+    ["And", "wrinkled", "lip,", "and", "sneer", "of", "cold", "command,"],
+    ["Tell", "that", "its", "sculptor", "well", "those", "passions", "read"],
+    ["Which", "yet", "survive,", "stamped", "on", "these", "lifeless", "things,"],
+    ["The", "hand", "that", "mocked", "them,", "and", "the", "heart", "that", "fed;"],
+    ["And", "on", "the", "pedestal,", "these", "words", "appear:"],
+    ["My", "name", "is", "Ozymandias,", "King", "of", "Kings;"],
+    ["Look", "on", "my", "Works,", "ye", "Mighty,", "and", "despair!"],
+    ["Nothing", "beside", "remains.", "Round", "the", "decay"],
+    ["Of", "that", "colossal", "Wreck,", "boundless", "and", "bare"],
+    ["The", "lone", "and", "level", "sands", "stretch", "far", "away.”"],
+  ],
+]
+
+let renderPoem = (poem) => {
+  for (let line of poem) {
+    for (let word of line) {
+      if (Math.random() > 0.75 && word != "-") {
+        let hashDiv = $("<div>")
+        hashDiv.text(`#${word}`)
+        hashDiv.addClass("hashtag")
+        $(".poem").append(hashDiv)
+      } else {
+        $(".poem").append(word)
+      }
+      $(".poem").append(" ")
+    }
+    $(".poem").append($("</br>"))
+  }
+}
+
+$(document).ready(function() {
+  let poem = randomChoice(poems)
+  renderPoem(poem)
+})
+</script>
+<title>#Poetry</title>
+  </head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>#Poetry</h1>
+      <div class="subtitle">(refresh to load a new version)</div>
+    </div>
+    <hr>
+    <div class="poem">
+    </div>
+  </div>
+</body>
+</html>

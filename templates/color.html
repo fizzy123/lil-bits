@@ -1,0 +1,239 @@
+<html>
+  <head>
+    <link rel="preload" as="fetch" href="https://octothorp.es/?uri=https://lil-bits.nobr.me/color" >
+<link rel="octo:octothorpes" href="weirdweboctober" >
+<link rel="octo:octothorpes" href="Color" >
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&family=Noto+Sans+Mono:wght@100..900&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<style>
+body {
+  margin: 0;
+  font-family: "Afacad Flux", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+}
+
+h1 {
+  margin: 10px 0px;
+  font-weight: 800
+}
+h2 {
+  margin: 5px 0px;
+}
+
+.config .subconfig {
+  padding: 1% 4%;
+}
+
+.settings-container {
+  padding: 0% 2%;
+}
+
+.config {
+  background-color: #121212;
+  color: #DDD;
+  width:49.9%;
+  display: inline-block;
+  min-height: 100dvh;
+}
+
+.example {
+  position:fixed;
+  display: inline-block;
+  width: 49.9%;
+  min-height: 100dvh;
+}
+
+.content {
+  padding: 10% 25%;
+}
+
+input {
+  background-color: #212A37;
+  color: #DDD;
+}
+
+input[type=color] {
+  background-color: transparent;
+}
+
+.code {
+  background-color: #212A37;
+}
+.code pre {
+  width: 49.9%;
+  display: inline-block; 
+  padding: 14px 16px;
+  margin: 0px;
+  font-family: "Noto Sans Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
+
+.code div {
+  display:inline-block;
+}
+
+::-webkit-color-swatch,
+::-moz-color-swatch {
+  border-color: transparent;
+}
+
+.copy {
+  color: #DDD;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+</style>
+<script>
+let palette = {
+  bg: "003049",
+  h1: "f77f00",
+  h2: "fcbf49",
+  text: "eae2b7",
+  links: "d62828"
+}
+
+let update = () => {
+  $(".example").css({
+    "backgroundColor": `#${palette.bg}`,
+    "color": `#${palette.text}`,
+  })
+  $(".example h1").css({
+    "color": `#${palette.h1}`,
+  })
+  $(".example h2").css({
+    "color": `#${palette.h2}`,
+  })
+  $(".example a").css({
+    "color": `#${palette.links}`,
+  })
+  $("#bg-color-output").text(palette.bg)
+  $("#text-color-output").text(palette.text)
+  $("#h1-color-output").text(palette.h1)
+  $("#h2-color-output").text(palette.h2)
+  $("#links-color-output").text(palette.links)
+
+  $("#bg-color-color").val(`#${palette.bg}`)
+  $("#bg-color-text").val(`${palette.bg}`)
+
+  $("#h1-color-color").val(`#${palette.h1}`)
+  $("#h1-color-text").val(`${palette.h1}`)
+
+  $("#h2-color-color").val(`#${palette.h2}`)
+  $("#h2-color-text").val(`${palette.h2}`)
+
+  $("#text-color-color").val(`#${palette.text}`)
+  $("#text-color-text").val(`${palette.text}`)
+
+  $("#links-color-color").val(`#${palette.links}`)
+  $("#links-color-text").val(`${palette.links}`)
+}
+$(document).ready(function() {
+  update()
+  $("input").on("change", function(e) {
+    let field = $(this).attr('id').split("-")[0]
+    palette[field] = $(this).val().replace("#","")
+    update()
+  })
+  $(".copy").on("click", function(e) {
+    let id = $(this).attr('id').split("-")[0]
+    if (id === "css") {
+      navigator.clipboard.writeText($(".code code").text().trim());
+    } else {
+      navigator.clipboard.writeText(`#${palette[id]}`.trim());
+    }
+  })
+})
+</script>
+<title>Palette Tester</title>
+  </head>
+<body>
+  <div class="config">
+    <div class="settings subconfig">
+      <h1>Color Setter</h1>
+      <div class="settings-container">
+      <div>
+        <label for="bg-color">Background:</label>
+        <input type="color" id="bg-color-color" name="bg-color-color" />
+        #<input type="text" id="bg-color-text" name="bg-color-text" size="10" />
+        <div class="copy" id="bg-color-copy">&#x2398;</div>
+      </div>
+      <div>
+        <label for="h1-color">Header 1:</label>
+        <input type="color" id="h1-color-color" name="h1-color-color" />
+        #<input type="text" id="h1-color-text" name="h1-color-text" size="10" />
+        <div class="copy" id="h1-color-copy">&#x2398;</div>
+      </div>
+      <div>
+        <label for="h2-color">Header 2:</label>
+        <input type="color" id="h2-color-color" name="h2-color-color" />
+        #<input type="text" id="h2-color-text" name="h2-color-text" size="10" />
+        <div class="copy" id="h2-color-copy">&#x2398;</div>
+      </div>
+      <div>
+        <label for="text-color">Text:</label>
+        <input type="color" id="text-color-color" name="text-color-color" />
+        #<input type="text" id="text-color-text" name="text-color-text" size="10" />
+        <div class="copy" id="text-color-copy">&#x2398;</div>
+      </div>
+      <div>
+        <label for="links-color">Links:</label>
+        <input type="color" id="links-color-color" name="links-color-color" />
+        #<input type="text" id="links-color-text" name="links-color-text" size="10" />
+        <div class="copy" id="links-color-copy">&#x2398;</div>
+      </div>
+      </div>
+    </div>
+    <div class="subconfig">
+      <h1> CSS Copy</h1>
+      <div class="code"><pre><code>body: {
+    background-color: #<div id="bg-color-output"></div>
+    color: #<div id="text-color-output"></div>
+}
+h1: {
+    color: #<div id="h1-color-output"></div>
+}
+h2: {
+    color: #<div id="h2-color-output"></div>
+}
+a: {
+    color: #<div id="links-color-output"></div>
+}</pre>
+      </code>
+      <div style="text-align:right;width: 44.9%;" class="copy" id="css-color-copy"><div style="padding: 0px 12px;">&#x2398;</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="example">
+    <div class="content">
+    <h1>Palette Tester</h1>
+    <h2>What is this?</h2>
+    <div>
+      I'm endlessly trying out various color palettes to use for different websites, so I figured that, for <a href="https://weirdweboctober.website/">Weird Web October</a> I might as well make a website that makes making websites easier!
+    </div>
+    <h2>How do I use it?</h2>
+    <div>
+      Just play with the various color fields on the left to dynamically change the colors of the various fields. I've also provided a section of easy to copy CSS to move to your website!
+    </div>
+    <h2>Where can I get palettes?</h2>
+    <div>
+      I'm not a natural artist by any means so I usually just steal color palettes online. I personally really like <a href="https://coolors.co/">Coolors</a> but honestly you can just pull palettes from photographs, art or even outfits.
+    </div>
+    </div>
+  </div>
+</body>
+</html>

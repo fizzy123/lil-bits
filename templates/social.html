@@ -1,0 +1,361 @@
+<html>
+  <head>
+    <link rel="preload" as="fetch" href="https://octothorp.es/?uri=https://lil-bits.nobr.me/social" >
+<link rel="octo:octothorpes" href="weirdweboctober" >
+<link rel="octo:octothorpes" href="Social" >
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<style>
+body {
+  margin: 0;
+  font-family: "Afacad Flux", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+  background-color: #121212;
+  color: #DDD;
+}
+
+.container {
+  width: 800px;
+  text-align: center;
+  margin: auto;
+}
+
+.submit,.cheat,.refresh {
+  border: 1px solid #DDD;
+  margin-top: 8px;
+  padding: 0px 5px 3px 5px;
+  width: fit-content;
+  cursor: pointer;
+  margin: auto;
+}
+
+.take {
+  font-weight: 800;
+  font-size: 48px;
+  margin: 48px;
+}
+
+.real-input,.expected-input {
+  text-align: left;
+  width: 400px;
+  margin: auto;
+  padding-bottom: 24px;
+}
+
+.results-container {
+  text-align: left;
+  width: 400px;
+  margin: auto;
+  padding-top: 24px;
+}
+
+.header {
+  font-size: 24px;
+  font-weight: 700;
+  padding-bottom: 12px;
+}
+
+.real {
+  padding-bottom: 24px;
+}
+
+.bar {
+  background-color: white;
+  height: 10px;
+  display: inline-block;
+}
+
+.percentage {
+  display: inline-block;
+}
+
+.result-label {
+  font-weight: 600
+}
+
+.cheat {
+  margin-top: 10px;
+}
+
+.refresh {
+  margin-top: 18px;
+  margin-bottom: 36px;
+}
+</style>
+<script type="text/javascript">
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+</script>
+<script>
+// supports both simple arrays and complex weighted arrays
+let randomChoice = (array) => {
+  if (array.length === 0) {
+    return
+  }
+  if (array[0].weight === undefined || Array.isArray(array[0])) {
+    return array[Math.floor(array.length * Math.random())]
+  } else {
+    // First, we loop the main dataset to count up the total weight. We're starting the counter at one because the upper boundary of Math.random() is exclusive.
+    var total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      total += parseInt(array[i].weight);
+    }
+
+    // Total in hand, we can now pick a random value akin to our
+    // random index from before.
+    const threshold = Math.random() * total;
+
+    // Now we just need to loop through the main data one more time
+    // until we discover which value would live within this
+    // particular threshold. We need to keep a running count of
+    // weights as we go, so let's just reuse the "total" variable
+    // since it was already declared.
+    total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      // Add the weight to our running total.
+      total += parseInt(array[i].weight);
+
+      // If this value falls within the threshold, we're done!
+      if (total >= threshold) {
+        return array[i].value;
+      }
+    }
+    return array[i].value;
+  }
+}
+
+const takes = [
+  "I'm doing the best that I can.",
+  "I'm happy with how much time I spend on my phone.",
+  "I am confident in my ability to communicate my needs to others.",
+  "My thoughts and actions are rational.",
+  "I take feedback gracefully.",
+  "I handle disagreements gracefully.",
+  "Modern music is just as good or better than it has ever been.",
+  "I am confident that I will not be canceled.",
+  "If someone is personally annoying to me, it's OK for me to exclude them, even if they're not doing anything morally wrong.",
+  "I feel comfortable making sure that I am heard, even if it makes others uncomfortable.",
+  "I know myself well.",
+  "I am living a life that is true to myself.",
+  "I have clear concrete goals for my life.",
+  "Generally speaking, I am a typical person.",
+  "Generally speaking, my problems are fairly typical.",
+  "Generally speaking, I am average.",
+  "Generally speaking, people should think more highly of themselves.",
+  "I enjoy small-talk.",
+  "I can empathize with people, even when I disagree with them.",
+  "I am a good person.",
+  "I'm comfortable thinking about the ways in which I can improve.",
+  "I give as much as, or more than I receive.",
+  "I am good enough at recognizing my own cognitive biases.",
+]
+
+let index = 0
+if (localStorage.index) {
+  index = (parseInt(localStorage.index) + 1) % takes.length
+}
+localStorage.index = index
+
+let loadData = (data) => {
+  $(".results-container").show()
+  let expectedTotal = data.expected["1"] + data.expected["2"] + data.expected["3"] + data.expected["4"] + data.expected["5"]
+  let realTotal = data.real["1"] + data.real["2"] + data.real["3"] + data.real["4"] + data.real["5"]
+
+  $(".real-result-one-bar").css("width", `${(data.real["1"]/realTotal * 100).toFixed(2)}%`)
+  $(".real-result-one-percentage").text(`${(data.real["1"]/realTotal * 100).toFixed(2)}%`)
+
+  $(".real-result-two-bar").css("width", `${(data.real["2"]/realTotal * 100).toFixed(2)}%`)
+  $(".real-result-two-percentage").text(`${(data.real["2"]/realTotal * 100).toFixed(2)}%`)
+
+  $(".real-result-three-bar").css("width", `${(data.real["3"]/realTotal * 100).toFixed(2)}%`)
+  $(".real-result-three-percentage").text(`${(data.real["3"]/realTotal * 100).toFixed(2)}%`)
+
+  $(".real-result-four-bar").css("width", `${(data.real["4"]/realTotal * 100).toFixed(2)}%`)
+  $(".real-result-four-percentage").text(`${(data.real["4"]/realTotal * 100).toFixed(2)}%`)
+
+  $(".real-result-five-bar").css("width", `${(data.real["5"]/realTotal * 100).toFixed(2)}%`)
+  $(".real-result-five-percentage").text(`${(data.real["5"]/realTotal * 100).toFixed(2)}%`)
+
+
+  $(".expected-result-one-bar").css("width", `${(data.expected["1"]/expectedTotal * 100).toFixed(2)}%`)
+  $(".expected-result-one-percentage").text(`${(data.expected["1"]/expectedTotal * 100).toFixed(2)}%`)
+
+  $(".expected-result-two-bar").css("width", `${(data.expected["2"]/expectedTotal * 100).toFixed(2)}%`)
+  $(".expected-result-two-percentage").text(`${(data.expected["2"]/expectedTotal * 100).toFixed(2)}%`)
+
+  $(".expected-result-three-bar").css("width", `${(data.expected["3"]/expectedTotal * 100).toFixed(2)}%`)
+  $(".expected-result-three-percentage").text(`${(data.expected["3"]/expectedTotal * 100).toFixed(2)}%`)
+
+  $(".expected-result-four-bar").css("width", `${(data.expected["4"]/expectedTotal * 100).toFixed(2)}%`)
+  $(".expected-result-four-percentage").text(`${(data.expected["4"]/expectedTotal * 100).toFixed(2)}%`)
+
+  $(".expected-result-five-bar").css("width", `${(data.expected["5"]/expectedTotal * 100).toFixed(2)}%`)
+  $(".expected-result-five-percentage").text(`${(data.expected["5"]/expectedTotal * 100).toFixed(2)}%`)
+}
+
+$(document).ready(function() {
+  $(".take").text(takes[index])
+  $(".results-container").hide()
+
+  $(".submit").on("click", function() {
+    let realValue = $("input[name='real-value']:checked").val()
+    let expectedValue = $("input[name='expected-value']:checked").val()
+    $.ajax({
+      url: "/social",
+      dataType: "JSON",
+      contentType : "application/json",
+      data: JSON.stringify({"index": index, "realValue": realValue, "expectedValue": expectedValue}),
+      type: "POST",
+      success: loadData,
+    });
+  })
+
+  $(".cheat").on("click", function() {
+    $.ajax({
+      url: "/social",
+      dataType: "JSON",
+      contentType : "application/json",
+      data: JSON.stringify({"index": index, "cheat": true}),
+      type: "POST",
+      success: loadData,
+    });
+  })
+  $(".refresh").on("click", function() {
+    window.location.reload()
+  })
+})
+</script>
+<title>Opinion Aggregator</title>
+  </head>
+<body>
+  <div class="container">
+    <div class="take"></div>
+    <div class="real-input">
+      <div>Do you agree with this statement?</div>
+      <div class="option">
+          <input type="radio" id="real-value-four" name="real-value" value="5"/>
+          <label for="5">Strongly Agree</label> 
+      </div>
+      <div class="option">
+          <input type="radio" id="real-value-four" name="real-value" value="4"/>
+          <label for="4">Agree</label> 
+      </div>
+      <div class="option">
+          <input type="radio" id="real-value-three" name="real-value" value="3"/>
+          <label for="3">Neither Agree Nor Disagree</label> 
+      </div>
+      <div class="option">
+          <input type="radio" id="real-value-two" name="real-value" value="2"/>
+          <label for="2">Disagree</label> 
+      </div>
+      <div class="option">
+          <input type="radio" id="real-value-one" name="real-value" value="1"/>
+          <label for="1">Strongly Disagree</label> 
+      </div>
+    </div>
+    <div class="expected-input">
+      <div>Do you think most people would agree with this?</div>
+      <div class="option">
+          <input type="radio" id="expected-value-four" name="expected-value" value="5"/>
+          <label for="5">Strongly Agree</label> 
+      </div>
+      <div class="option">
+          <input type="radio" id="expected-value-four" name="expected-value" value="4"/>
+          <label for="4">Agree</label> 
+      </div>
+      <div class="option">
+          <input type="radio" id="expected-value-three" name="expected-value" value="3"/>
+          <label for="3">Neither Agree Nor Disagree</label> 
+      </div>
+      <div class="option">
+          <input type="radio" id="expected-value-two" name="expected-value" value="2"/>
+          <label for="2">Disagree</label> 
+      </div>
+      <div class="option">
+          <input type="radio" id="expected-value-one" name="expected-value" value="1"/>
+          <label for="1">Strongly Disagree</label> 
+      </div>
+    </div>
+    <div class="submit">Submit</div>
+    <div class="cheat">I already answered this one and want to see results.</div>
+    <div class="results-container">
+      <div class="real">
+        <div class="header">How have people answered?</div>
+        <div class="results">
+          <div class="result real-result-five">
+            <div class="result-label">Strongly Agree</div>
+            <div class="real-result-five-bar bar"></div>
+            <div class="real-result-five-percentage percentage"></div>
+          </div>
+          <div class="result real-result-four">
+            <div class="result-label">Agree</div>
+            <div class="real-result-four-bar bar"></div>
+            <div class="real-result-four-percentage percentage"></div>
+          </div>
+          <div class="result real-result-three">
+            <div class="result-label">Neither Agree Nor Disagree</div>
+            <div class="real-result-three-bar bar"></div>
+            <div class="real-result-three-percentage percentage"></div>
+          </div>
+          <div class="result real-result-two">
+            <div class="result-label">Disagree</div>
+            <div class="real-result-two-bar bar"></div>
+            <div class="real-result-two-percentage percentage"></div>
+          </div>
+          <div class="result real-result-one">
+            <div class="result-label">Strongly Disagree</div>
+            <div class="real-result-one-bar bar"></div>
+            <div class="real-result-one-percentage percentage"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="expected">
+        <div class="header">How did people think others would answer?</div>
+        <div class="results">
+          <div class="result expected-result-five">
+            <div class="result-label">Strongly Agree</div>
+            <div class="expected-result-five-bar bar"></div>
+            <div class="expected-result-five-percentage percentage"></div>
+          </div>
+          <div class="result expected-result-four">
+            <div class="result-label">Agree</div>
+            <div class="expected-result-four-bar bar"></div>
+            <div class="expected-result-four-percentage percentage"></div>
+          </div>
+          <div class="result expected-result-three">
+            <div class="result-label">Neither Agree Nor Disagree</div>
+            <div class="expected-result-three-bar bar"></div>
+            <div class="expected-result-three-percentage percentage"></div>
+          </div>
+          <div class="result expected-result-two">
+            <div class="result-label">Disagree</div>
+            <div class="expected-result-two-bar bar"></div>
+            <div class="expected-result-two-percentage percentage"></div>
+          </div>
+          <div class="result expected-result-one">
+            <div class="result-label">Strongly Disagree</div>
+            <div class="expected-result-one-bar bar"></div>
+            <div class="expected-result-one-percentage percentage"></div>
+          </div>
+        </div>
+      </div>
+      <div class="refresh">Show me another.</div>
+    </div>
+  </div>
+</body>
+</html>

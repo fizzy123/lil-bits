@@ -1,0 +1,328 @@
+<html>
+  <head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<style>
+body {
+  margin: 0;
+  font-family: "Afacad Flux", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+  background-color: #121212;
+  color: #DDD;
+}
+
+.submit {
+  border: 1px solid #DDD;
+  margin-top: 8px;
+  padding: 0px 5px 3px 5px;
+  width: fit-content;
+  cursor: pointer;
+  margin: auto;
+  margin-top: 10px;
+}
+
+.lyrics {
+  width: 100%;
+  height: 100%;
+  border-width: 0px
+}
+
+h1 {
+  margin: 12px;
+}
+
+h2 {
+  margin-left: 12px;
+  margin-top: 0px;
+  margin-bottom: 8px;
+}
+
+.disclaimer {
+    padding-left: 12px;
+    color: #999;
+    font-weight: normal;
+    margin-top: -4px;
+    margin-bottom: 11px;
+    font-size: 16px;
+}
+</style>
+<script type="text/javascript">
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+</script>
+<script>
+// supports both simple arrays and complex weighted arrays
+let randomChoice = (array) => {
+  if (array.length === 0) {
+    return
+  }
+  if (array[0].weight === undefined || Array.isArray(array[0])) {
+    return array[Math.floor(array.length * Math.random())]
+  } else {
+    // First, we loop the main dataset to count up the total weight. We're starting the counter at one because the upper boundary of Math.random() is exclusive.
+    var total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      total += parseInt(array[i].weight);
+    }
+
+    // Total in hand, we can now pick a random value akin to our
+    // random index from before.
+    const threshold = Math.random() * total;
+
+    // Now we just need to loop through the main data one more time
+    // until we discover which value would live within this
+    // particular threshold. We need to keep a running count of
+    // weights as we go, so let's just reuse the "total" variable
+    // since it was already declared.
+    total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      // Add the weight to our running total.
+      total += parseInt(array[i].weight);
+
+      // If this value falls within the threshold, we're done!
+      if (total >= threshold) {
+        return array[i].value;
+      }
+    }
+    return array[i].value;
+  }
+}
+
+if (localStorage.refresh_token && (localStorage.access_token == "undefined")) {
+  localStorage.clear()
+}
+
+let currentSong = "";
+const clientId = 'ac1451bcb3ce4217bb195b2d094af9a8';
+const redirectUri = 'https://lil-bits.nobr.me/spotify_lyrics';
+
+const scope = 'user-read-currently-playing';
+const authUrl = new URL("https://accounts.spotify.com/authorize")
+
+const generateRandomString = (length) => {
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const values = crypto.getRandomValues(new Uint8Array(length));
+  return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+}
+
+const codeVerifier  = generateRandomString(64);
+
+const sha256 = async (plain) => {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(plain)
+  return window.crypto.subtle.digest('SHA-256', data)
+}
+
+const base64encode = (input) => {
+  return btoa(String.fromCharCode(...new Uint8Array(input)))
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
+
+function makeid(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+let code = urlParams.get('code');
+let state = urlParams.get("state");
+
+const getRefreshToken = async () => {
+ // refresh token that has been previously stored
+ const refreshToken = localStorage.getItem('refresh_token');
+ const url = "https://accounts.spotify.com/api/token";
+
+  const payload = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: clientId
+    }),
+  }
+  const body = await fetch(url, payload);
+  const response = await body.json();
+
+  localStorage.setItem('access_token', response.access_token);
+  if (response.refresh_token) {
+    localStorage.setItem('refresh_token', response.refresh_token);
+  }
+}
+
+let loadLyrics = async () => {
+  if (localStorage.expiration_time < Date.now()) {
+    await getRefreshToken()
+  }
+
+  // query spotify
+  let payload = {
+    method: 'GET',
+    headers: {
+      "Authorization": `Bearer ${localStorage.access_token}`
+    },
+  }
+  let body = await fetch("https://api.spotify.com/v1/me/player/currently-playing", payload);
+  let response = await body.json();
+
+  // query genius
+  let song = response.item.name
+  let artist = response.item.artists[0].name
+  let searchParams = `${song.replace(/ \(.*\)/i,"")} ${artist}`
+  if (searchParams !== currentSong) {
+
+    currentSong = searchParams
+
+    let payload = {
+      method: 'GET'
+    }
+    let body = await fetch("https://api.genius.com/search?" + new URLSearchParams({
+      q: searchParams,
+      access_token: geniusClientAccessToken,
+    }).toString(), payload);
+    let response = await body.json();
+    if (response.response.hits.length) {
+      let songId = response.response.hits[0].result.id
+      $(".title").text(response.response.hits[0].result.title_with_featured);
+      $(".artist").text(response.response.hits[0].result.artist_names);
+      $(".lyrics").attr("srcdoc", `
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0px;
+  font-family: "Afacad Flux", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+  font-size: 18px;
+}
+
+div.rg_embed {
+  width: 100%;
+  height: 100%;
+  margin-top: 0px;
+}
+
+div.rg_embed .rg_embed_header {
+  height: 0px;
+}
+</style>
+<div id='rg_embed_link_${songId}' class='rg_embed_link' data-song-id='${songId}'></div> <script crossorigin src='//genius.com/songs/${songId}/embed.js'></scri` + "pt>")
+    } else {
+      $(".lyrics").attr("srcdoc", "<div>no lyrics found</div>")
+    }
+  } else {
+//console.log("song hasnt changed");
+  }
+}
+
+const getToken = async () => {
+  // stored in the previous step
+  let codeVerifier = localStorage.getItem('code_verifier');
+
+  const url = "https://accounts.spotify.com/api/token";
+  const payload = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      client_id: clientId,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: redirectUri,
+      code_verifier: codeVerifier,
+    }),
+  }
+
+  const body = await fetch(url, payload);
+  const response = await body.json();
+
+  localStorage.setItem('access_token', response.access_token);
+  localStorage.setItem('expiration_time', response.expires_in * 1000 + Date.now());
+  localStorage.setItem('refresh_token', response.refresh_token);
+  setInterval(loadLyrics, 1000)
+}
+
+const geniusClientAccessToken = "Y7TiP5IyR7yBFx0QL1rVhzCxiFInZcQmwMezo2WmXzoUfdt2V_CcDjtL9hkADEPy"
+
+$(document).ready(function() {
+  if (!localStorage.access_token && code) {
+    if (state === window.localStorage["state"]) {
+      getToken()
+    } else {
+      console.log("state does not match")
+    }
+  }
+  if (code || localStorage.access_token) {
+    $(".submit").hide()
+  } else {
+    $(".lyrics").hide()
+  }
+  if (localStorage.access_token) {
+    setInterval(loadLyrics, 1000)
+  }
+  $(".submit").on("click", async function() {
+    const hashed = await sha256(codeVerifier)
+    const codeChallenge = base64encode(hashed);
+    
+    // generated in the previous step
+    window.localStorage.setItem('code_verifier', codeVerifier);
+    let state = makeid(16)
+    window.localStorage.setItem('state', state);
+    
+    const params =  {
+      response_type: 'code',
+      client_id: clientId,
+      scope,
+      code_challenge_method: 'S256',
+      code_challenge: codeChallenge,
+      state: state,
+      redirect_uri: redirectUri,
+    }
+    
+    authUrl.search = new URLSearchParams(params).toString();
+    window.location.href = authUrl.toString();
+  })
+})
+</script>
+<title>Spotify Lyrics</title>
+  </head>
+<body>
+  <div class="container">
+    <div class="submit">Connect to Spotify</div>
+    <h1 class="title"></h1>
+    <h2 class="artist"></h2>
+    <h3 class="disclaimer">If the song doesn't match, we couldn't find that song on Genius. You should add it!</h3>
+    <iframe class="lyrics"></iframe>
+  </div>
+</body>
+</html>

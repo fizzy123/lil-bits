@@ -1,0 +1,306 @@
+<html>
+  <head>
+    <link rel="preload" as="fetch" href="https://octothorp.es/?uri=https://lil-bits.nobr.me/food" >
+<link rel="octo:octothorpes" href="weirdweboctober" >
+<link rel="octo:octothorpes" href="Food" >
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<style>
+body {
+  margin: 0;
+  font-family: "Afacad Flux", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+  background-color: #003049;
+  color: #eae2b7;
+}
+
+h1 {
+  margin-bottom: 8px;
+  font-size: 118px;
+  line-height: 114px;
+  margin-top: 40px;
+  color: #fcbf49;
+}
+
+.container {
+  width: 800px;
+  margin: auto;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 18px;
+  margin: 0px 4px;
+  color: #f77f00;
+}
+
+.dish-name {
+  text-transform: capitalize;
+  font-size: 36px;
+  width: 400px;
+  margin: auto;
+  padding-top: 33px;
+  font-weight: 200; 
+}
+</style>
+<script type="text/javascript">
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+</script>
+<script>
+// supports both simple arrays and complex weighted arrays
+let randomChoice = (array) => {
+  if (array.length === 0) {
+    return
+  }
+  if (array[0].weight === undefined || Array.isArray(array[0])) {
+    return array[Math.floor(array.length * Math.random())]
+  } else {
+    // First, we loop the main dataset to count up the total weight. We're starting the counter at one because the upper boundary of Math.random() is exclusive.
+    var total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      total += parseInt(array[i].weight);
+    }
+
+    // Total in hand, we can now pick a random value akin to our
+    // random index from before.
+    const threshold = Math.random() * total;
+
+    // Now we just need to loop through the main data one more time
+    // until we discover which value would live within this
+    // particular threshold. We need to keep a running count of
+    // weights as we go, so let's just reuse the "total" variable
+    // since it was already declared.
+    total = 0;
+    for (var i = 0; i < array.length; ++i) {
+      // Add the weight to our running total.
+      total += parseInt(array[i].weight);
+
+      // If this value falls within the threshold, we're done!
+      if (total >= threshold) {
+        return array[i].value;
+      }
+    }
+    return array[i].value;
+  }
+}
+
+let forms = [
+  "pizza",
+  "burrito",
+  "taco",
+  "burger",
+  "ramen",
+  "pasta",
+  "sushi",
+  "pie",
+  "nachos",
+  "handroll",
+  "dumplings",
+  "bibimbap",
+  "mac and cheese",
+  "melt",
+  "bao",
+  "fried noodles",
+  "omelette",
+  "eggs benedict",
+  "quiche",
+  "lasagna",
+  "quesedilla",
+  "chowder",
+  "chow mein",
+  "vermicelli",
+  "spring rolls",
+  "onigiri",
+  "quinoa salad",
+  "enchiladas",
+  "chili",
+  "paella",
+  "noodle soup",
+  "calzone",
+  "ravioli",
+  "pho",
+  "pasta bake",
+  "pad thai",
+  "stew",
+  "fried rice",
+  "penne",
+  "tortellini",
+  "baked potato",
+  "croquette",
+  "bean soup",
+  "tamales",
+  "risotto",
+  "udon",
+  "hand pulled noodles",
+]
+
+let flavors = [
+  "chicken tikka masala",
+  "korean friend chicken",
+  "bbq pulled pork",
+  "bbq brisket",
+  "nashville hot chicken",
+  "smoked salmon",
+  "ahi tuna",
+  "oven roasted potato",
+  "grilled haloumi",
+  "caprese",
+  "tea egg",
+  "pesto",
+  "japanese curry",
+  "pork katsu",
+  "roasted duck",
+  "chicken parm",
+  "fried mozzerella",
+  "country gravy",
+  "teriyaki chicken",
+  "swedish meatball",
+  "crispy chickpea",
+  "salt and pepper tofu",
+  "mapo tofu",
+  "chicken satay",
+  "carnitas",
+  "salmon ceviche",
+  "cheeseburger",
+  "chicken adobo",
+  "beef stroganoff",
+  "jambalaya",
+  "roasted sweet potato",
+  "falafel",
+  "smashed potato",
+  "grilled seitan",
+  "barbacoa",
+  "al pastor",
+  "chorizo",
+  "kaarage",
+  "breakfast",
+  "butternut squash",
+  "ratatouille",
+  "philly cheesesteak",
+  "chicken biriyani",
+  "char siu",
+  "crispy pork belly",
+  "steak tartare",
+  "buttered crab",
+  "buttered lobster",
+  "zucchini fritter",
+  "lemon parmesan salmon",
+  "deep fried mushroom",
+  "crab cake",
+  "gumbo",
+  "bulgogi",
+  "galbi",
+  "salisbury steak",
+  "reuben",
+  "french onion",
+  "seasame chicken",
+  "saag paneer",
+  "shrimp scampi",
+  "chicken cordon bleu",
+  "coconut curry",
+  "birria",
+  "coq au vin",
+  "lamb shawarma",
+  "fried fish",
+  "eggplant parmesan",
+  "bourbon chicken",
+  "rotisserie chicken",
+  "soy glazed tempeh",
+  "acorn squash",
+  "cacio e pepe",
+  "carbonara",
+]
+
+let sides = [
+  "kimchi",
+  "szechuan cucumbers",
+  "sundried tomatoes",
+  "carmelized onions",
+  "wasabi coleslaw",
+  "corn cheese",
+  "guacamole",
+  "tzaziki",
+  "spinach",
+  "roasted cauliflower",
+  "roasted broccoli",
+  "roasted brussels sprout",
+  "roasted asparagus",
+  "hummus",
+  "baba ganoush",
+  "mango salsa",
+  "salsa verde",
+  "edamame",
+  "kale",
+  "roasted beets",
+  "roasted zucchini",
+  "roasted bell peppers",
+  "chimichurri",
+  "chili crisp",
+  "toum",
+  "garlic aioli",
+  "tabbouleh",
+  "szechuan green beans",
+  "roasted peanuts",
+  "roasted cashews",
+  "roasted pistachios",
+  "sauerkraut",
+  "avocado crema",
+  "garlic yogurt",
+  "mushroom",
+  "truffle",
+  "collard greens",
+]
+
+notAllowed = {
+  "burger": [
+    "cheeseburger"
+  ],
+  "baked potato": [
+    "smashed potato",
+    "roasted sweet potato",
+    "oven roasted potato",
+  ]
+}
+
+$(document).ready(function() {
+  let form = randomChoice(forms)
+  let forbidden = notAllowed[form]
+  if (forbidden == undefined) {
+    forbidden = []
+  }
+  flavors = flavors.filter((flavor) => !forbidden.includes(flavor))
+  console.log(flavors)
+  let flavor = randomChoice(flavors)
+  let side = randomChoice(sides)
+  $(".dish-name").text(`${flavor} ${form} with ${side}`)
+})
+</script>
+<title>Chaos Dish Generator</title>
+  </head>
+<body>
+  <div class="container">
+    <div>
+      <h1>Chaos Dish Generator</h1>
+      <div class="subtitle">(refresh to get a new dish)</div>
+    </div>
+    <div>
+      <h2 class="dish-name"></h2>
+    </div>
+  </div>
+</body>
+</html>
