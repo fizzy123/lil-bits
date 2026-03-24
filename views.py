@@ -84,6 +84,10 @@ def audio():
 def social_get():
     return render_template('social.html')
 
+@app.route("/neighborhood", methods=["GET"])
+def neighborhood_get():
+    return render_template('neighborhood.html')
+
 @app.route("/social", methods=["POST"])
 def social_post():
     data = request.get_json()

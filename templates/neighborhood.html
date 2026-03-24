@@ -1,0 +1,35 @@
+<html>
+  <head>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const viewport = tapspace.createView('#tapspace')
+      const space = tapspace.createSpace()
+      viewport.addChild(space)
+      const map = tapspace.createItem('<img src="static/fake_map.png">')
+      space.addChild(map, space.at(0,0)
+      const map = tapspace.createItem('<<i class="fa-solid fa-location-pin"></i>')
+      space.addChild(map, space.at(100,100)
+    })
+  </script>
+  <script src="https://kit.fontawesome.com/0c071994fd.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      background: #111;
+      color: grey;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    .myspaceapp {
+      background: black;
+      cursor: grab;
+      height: 100dvh;
+    }
+  </style>
+  </head>
+  <body>
+    <div id="tapspace" class="myspaceapp"></div>
+
+    <script defer  src="https://unpkg.com/tapspace@2.0.0-alpha.24/dist/tapspace.min.js"></script>
+  </body>
+</html>
