@@ -1,12 +1,10 @@
-import re
-import urllib
 import logging
-import json
+import random
 import redis
-from flask import render_template, request, jsonify, session, redirect, url_for, Response
+from flask import render_template, request, jsonify, redirect
 
 from server import app
-r = redis.Redis()
+r = redis.Redis(host="redis")
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +29,7 @@ def color():
     return render_template('color.html')
 
 @app.route("/list", methods=["GET"])
-def list():
+def list_view():
     return render_template('list.html')
 
 @app.route("/list-data", methods=["GET"])
@@ -108,3 +106,23 @@ def social_post():
 def spotify_lyrics():
     return render_template('spotify_lyrics.html')
 
+@app.route("/html_day", methods=["GET"])
+def html_day():
+    return render_template('html_day.html')
+
+@app.route("/feed", methods=["GET"])
+def feed():
+    feed_str = r.get("feed").decode("utf-8")
+    feed_items = feed_str.split()
+    chosen_item = feed_items[random.randint(0,len(feed_items) - 1)]
+
+    return redirect(chosen_item)
+
+@app.route("/favorites_pages", methods=["GET"])
+def favorites_pages():
+    return render_template('favorites_pages.html')
+
+
+@app.route("/fav", methods=["GET"])
+def fav():
+    return render_template('fav.html')

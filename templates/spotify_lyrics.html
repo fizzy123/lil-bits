@@ -192,9 +192,17 @@ let loadLyrics = async () => {
   // query genius
   let song = response.item.name
   let artist = response.item.artists[0].name
-  let searchParams = `${song.replace(/ \(.*\)/i,"")} ${artist}`
+  let spotifyArtistCount = response.item.artists.length
+  let sanitizedSong = song.replace(/ \(.*\)/i,"")
+  // edge case handler for
+  // - songs on kendrick lamar's DAMN.
+  // - Now or Never by kendrick lamar
+  sanitizedSong = sanitizedSong.split(" FEAT.")[0].replace("- Bonus Track", "")
+  if (sanitizedSong.slice(0, 12) == "Moon Halo - ") {
+    sanitizedSong = "Moon Halo"
+  }
+  let searchParams = `${sanitizedSong} ${artist}`
   if (searchParams !== currentSong) {
-
     currentSong = searchParams
 
     let payload = {
@@ -205,10 +213,23 @@ let loadLyrics = async () => {
       access_token: geniusClientAccessToken,
     }).toString(), payload);
     let response = await body.json();
-    if (response.response.hits.length) {
-      let songId = response.response.hits[0].result.id
-      $(".title").text(response.response.hits[0].result.title_with_featured);
-      $(".artist").text(response.response.hits[0].result.artist_names);
+    let hit
+    if (response.response.hits[0]) {
+      hit = response.response.hits[0]
+    }
+    // edge case handler for more by lawrence
+    if (spotifyArtistCount == 1) {
+      artistFilteredHits = response.response.hits.filter((hit) => {
+        return hit.result.primary_artist.name.toLowerCase() === artist.toLowerCase()
+      })
+      if (artistFilteredHits.length) {
+        hit = artistFilteredHits[0]
+      }
+    }
+    if (hit) {
+      let songId = hit.result.id
+      $(".title").text(hit.result.title_with_featured);
+      $(".artist").text(hit.result.artist_names);
       $(".lyrics").attr("srcdoc", `
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
