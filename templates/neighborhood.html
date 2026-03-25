@@ -2,12 +2,19 @@
   <head>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const viewport = tapspace.createView('#tapspace')
+      const viewport = tapspace.createView('#tapspace').zoomable().focusable().responsive()
       const space = tapspace.createSpace()
       viewport.addChild(space)
+
+      // Steal focus to viewport when panning.
+      viewport.on('pinchstart', () => {
+  	    viewport.focus({ focusVisible: false })
+      })
       const map = tapspace.createItem('<img src="/static/fake_map.png">')
+      map.setContentInput(false)
       space.addChild(map, space.at(0,0))
       const pin = tapspace.createItem('<i class="fa-solid fa-location-pin"></i>')
+      pin.setContentInput('pointer')
       space.addChild(pin, space.at(100,100))
     })
   </script>
@@ -15,13 +22,13 @@
   <style>
     body {
       background: #111;
-      color: grey;
+      color: black;
       margin: 0;
       padding: 0;
       height: 100%;
     }
     .myspaceapp {
-      background: black;
+      background: #f6f2e9;
       cursor: grab;
       height: 100dvh;
     }
