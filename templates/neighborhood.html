@@ -1,6 +1,78 @@
 <html>
   <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=IBM+Plex+Serif&family=Nanum+Myeongjo:wght@400;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
   <script>
+    async function load(path) {
+      try {
+        const response = await fetch(path);
+        const text = await response.text();
+        return text;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    let pins = {
+      "arrival": {
+        "x": 1004,
+        "y": 830,
+        "trigger": [
+          "henry",
+          "joan",
+          "anna",
+          "island",
+        ]
+      },
+      "henry": {
+        "x": 1130,
+        "y": 830,
+      },
+      "joan": {
+        "x": 1150,
+        "y": 820,
+      },
+      "anna": {
+        "x": 1150,
+        "y": 820,
+      },
+       "anna": {
+        "x": 1050,
+        "y": 720,
+      },     
+    }
+    let CURRENT_PIN = ""
+    let ADDED_PINS = {}
+    const addPin = (space, pinId) => {
+      if (ADDED_PINS[pinId]) {
+        return
+      }
+      console.log(`added pin ${pinId}`)
+      ADDED_PINS[pinId] = true
+      let pinInfo = pins[pinId]
+      const pin = tapspace.createItem(`<i id="${pinId}" class="fa-solid fa-location-pin pin"></i>`)
+      pin.setContentInput('pointer')
+      pin.setSize({ w: 10, h: 10 })
+      space.addChild(pin, space.at(pinInfo.x, pinInfo.y))
+
+      const pinElement = document.querySelector(`#${pinId}`);
+      pinElement.classList.add("unseen-node");
+
+      pinElement.addEventListener("click", async (event) => {
+        CURRENT_PIN = pinId
+        pinElement.classList.remove("unseen-node");
+        pinElement.classList.add("seen-node");
+        const content = document.querySelector("#content");
+        var source_text = await load(`/static/neighborhood/${pinId}.txt`);
+        content.innerHTML = source_text.replaceAll("\n","</br>");
+        const contentWrapper = document.querySelector("#content-wrapper");
+        contentWrapper.style.display = "inline-block"
+        contentWrapper.classList.remove("fade-out");
+        contentWrapper.classList.add("fade-in");
+      });
+      pinElement.classList.add("pin-add");
+      return pin
+    }
     document.addEventListener('DOMContentLoaded', () => {
       const viewport = tapspace.createView('#tapspace').zoomable().focusable().responsive()
       const space = tapspace.createSpace()
@@ -12,10 +84,24 @@
       })
       const map = tapspace.createItem('<img src="/static/fake_map.png">')
       map.setContentInput(false)
-      space.addChild(map, space.at(0,0))
-      const pin = tapspace.createItem('<i class="fa-solid fa-location-pin"></i>')
-      pin.setContentInput('pointer')
-      space.addChild(pin, space.at(100,100))
+      map.scaleBy(0.4)
+      space.addChild(map, space.at(0, 0))
+      let startPin = addPin(space, "arrival")
+      viewport.translateTo(startPin.atCenter())
+
+      const closeButton = document.querySelector(`#content-close-button`);
+      closeButton.addEventListener("click", async (event) => {
+        console.log("closing")
+        const contentWrapper = document.querySelector("#content-wrapper");
+        contentWrapper.classList.remove("fade-in");
+        contentWrapper.classList.add("fade-out");
+        if (CURRENT_PIN !== "" && "trigger" in pins[CURRENT_PIN]) {
+          for (const pinId of pins[CURRENT_PIN].trigger) {
+            await new Promise(r => setTimeout(r, 700));
+            addPin(space, pinId)
+          }
+        }
+      })
     })
   </script>
   <script src="https://kit.fontawesome.com/0c071994fd.js" crossorigin="anonymous"></script>
@@ -26,16 +112,119 @@
       margin: 0;
       padding: 0;
       height: 100%;
+      font-family: "Nanum Myeongjo", serif;
+      font-weight: 400;
+      font-style: normal;
     }
     .myspaceapp {
-      background: #f6f2e9;
+      background: #fbf7ea;
       cursor: grab;
       height: 100dvh;
+    }
+    .pin {
+      cursor: pointer;
+    }
+    #content-wrapper {
+      max-height:800px;
+      background: #fbf7ea;
+      color: #ab997e;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      margin-inline: auto;
+      width: fit-content;
+      border: 2px solid #ab997e;
+      z-index: 1;
+      text-align: right;
+      width: 40em;
+      padding: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    #content-close-button-wrapper {
+      right: 0;
+      margin: 14px;
+    }
+    #content-close-button {
+      cursor: pointer;
+    }
+    #content {
+      width: 90%;
+      margin: 24px auto;
+      margin-top: 0px;
+      text-align: left;
+      max-height: 600px;
+    }
+    .fade-in {
+      display: inline-block;
+      animation: fade-in 0.7s ease-in forwards;
+    }
+    .fade-out {
+      animation: fade-out 0.7s ease-out forwards;
+    }
+    @keyframes fade-in {
+      0% {
+        opacity: 0;
+        display: none;
+      }
+
+      100% {
+        opacity: 1;
+        display: inline-block;
+      }
+    }
+
+    @keyframes fade-out {
+      0% {
+        opacity: 1;
+        display: inline-block;
+      }
+
+      100% {
+        opacity: 0;
+        display: none;
+      }
+    }
+
+    .pin-add {
+      animation: pin-add 0.7s ease-out forwards;
+    }
+    @keyframes pin-add {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.3);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .title {
+      text-align: center;
+      font-size: 72px;
+      color: #553914;
+      font-weight: 800;
+      letter-spacing: 7px;
+    }
+
+    .unseen-node {
+      color: rgb(221 161 15);
+    }
+
+    .seen-node {
+      color: black;
     }
   </style>
   </head>
   <body>
     <div id="tapspace" class="myspaceapp"></div>
+    <div id="content-wrapper" style="">
+      <div id="content-close-button-wrapper"><i id="content-close-button" class="fa-solid fa-xmark"></i></div>
+      <div id="content"><div style="text-align:center">Welcome to</div><div class="title">HAWTHORNE</div><div style="text-align:center">"The Biggest Little Town In America"</div></div>
+    </div>
     <script defer  src="https://unpkg.com/tapspace@2.0.0-alpha.24/dist/tapspace.min.js"></script>
   </body>
 </html>
